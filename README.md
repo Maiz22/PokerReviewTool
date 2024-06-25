@@ -1,2 +1,3 @@
-# PokerReviewTool
+# PokerReviewTool (in progress)
 Pokerstars Review Tool reading a users hand history, parses it to create actions and displays the history inside a gui by recreating a poker table.
+Many different actions following an action base class/interface are created while parsing the hand history input file line by line. The parsing is done threw a regex which is a specific class attribute of every action type. Every action is added to the actioin registry at runtime and will later have a frontend implementation. The frontend should display a poker talbe and cards representing an actual game and allowing the user to review his game. To implement the GUI a mvc architecure is created. This project is still in progress. Action parsing is completely implemented. Frontend display of actions still to be done.
