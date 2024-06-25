@@ -1,0 +1,6 @@
+input/
+archive/
+__pycache__/
+.pytest_cache/
+node.txt
+output.txt
