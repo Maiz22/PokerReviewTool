@@ -1,27 +1,16 @@
-import os
-
-class TxtFileHandler:
+def parse_txt_to_list(path: str) -> list[str]:
     """
-    Class created for txt file interaction.
+    Takes a txt file and directory, opens the file and returns
+    a all lines in a list of strings.
     """
-    def __init__(self, filename:str, path:str) -> None:
-        self.filename = filename
-        self.path = path
+    try:
+        with open(path, "r", encoding="utf-8-sig") as file:
+            return file.readlines()
+    except FileNotFoundError:
+        print("File {} not foun in {}.".format(path, dir))
+    except Exception as err:
+        print(err)
 
-    def read_txt(self) -> None|list:
-        """
-        Takes the path and filename reads it and returns a
-        list of lines.
-        """
-        try:
-            if self.path:
-                with open(os.path.join(self.path, self.filename), "r", encoding='utf-8-sig') as txt:
-                    return txt.readlines()
-            with open(self.filename, "r", encoding='utf-8-sig') as txt:
-                return txt.readlines()
-        except FileNotFoundError:
-            print(F"Error: {self.filename} not found.")
-            return
-        except Exception as e:
-            print(f"Error: {e}")
-            return 
+
+def write_output_txt() -> None:
+    pass
