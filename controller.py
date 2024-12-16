@@ -13,6 +13,7 @@ class Controller:
         self.input_path = None
         self.all_rounds = []
         self.active_round = None
+        self.action_index = None
         self.round_number = 0
         self.view = view
         self.model = model
@@ -96,11 +97,14 @@ class Controller:
         self.view.text_field.insert("end", "{}\n".format(content))
         self.view.text_field.see("end")
 
+    def del_text_from_view(self) -> None:
+        self.view.text_field.delete("end-2l", "end-1l")
+
     def select_round(self, event=None) -> None:
         try:
-            self.round_number = int(self.view.round_number_var.get())
+            self.round_number = int(self.view.round_number_var.get()) - 1
             self.active_round = self.all_rounds[self.round_number]
-            self.print_to_view("Selected Round {}".format(self.round_number))
+            self.print_to_view("Selected Round {}".format(self.round_number + 1))
             self.action_index = 0
             self.set_action_button_activation_state()
         except IndexError:
@@ -120,16 +124,19 @@ class Controller:
         return
 
     def next_action(self, event) -> None:
-        if self.action_index < (len(self.active_round) - 1):
+        if not self.action_index is None and self.action_index < (
+            len(self.active_round) - 1
+        ):
             self.action_index += 1
             self.set_action_button_activation_state()
             self.print_to_view(content=self.active_round[self.action_index])
 
     def prev_action(self, event) -> None:
-        if self.action_index > 0:
+        if not self.action_index is None and self.action_index > 0:
             self.action_index -= 1
             self.set_action_button_activation_state()
-            self.print_to_view(content=self.active_round[self.action_index])
+            # self.print_to_view(content=self.active_round[self.action_index])
+            self.del_text_from_view()
 
     # def next_round(self) -> None:
     #    if self.round_number < len(self.all_rounds - 1):
