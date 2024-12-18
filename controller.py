@@ -129,7 +129,12 @@ class Controller:
         ):
             self.action_index += 1
             self.set_action_button_activation_state()
-            self.print_to_view(content=self.active_round[self.action_index])
+            self.print_to_view(
+                content="{} - {}".format(
+                    type(self.active_round[self.action_index]),
+                    self.active_round[self.action_index],
+                )
+            )
 
     def prev_action(self, event) -> None:
         if not self.action_index is None and self.action_index > 0:
