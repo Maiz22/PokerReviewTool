@@ -12,6 +12,7 @@ from action_registry import ActionRegistry
 
 if TYPE_CHECKING:
     import re
+    import pygame
 
 
 class BaseAction(ABC):
@@ -32,13 +33,14 @@ class UpdateSeat(BaseAction):
     def __init__(self, match: re.Match) -> None:
         self.seat_number = match[1]
         self.player = match[2]
-        # self.stack = match[3]
+        self.stack = match[3]
 
-    def execute(self):
+    def execute(self, surface: pygame.Surface):
+        # player = Player(name=self.player, stack=self.stack, seat= self.seat_number)
         pass
 
     def __repr__(self):
-        return f"[Action:UpdateSeat] Player: {self.player} - Seat: {self.seat_number}"
+        return f"[Action:UpdateSeat] Player: {self.player} - Seat: {self.seat_number} -Stack: {self.stack}"
 
 
 @ActionRegistry.register()
@@ -611,8 +613,8 @@ class UpdateTable(BaseAction):
         self.table_id = match[1]
         self.btn_seat = match[2]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, positions: list[tuple[int, int]], seats: dict) -> None:
+        pass
 
     def __repr__(self) -> str:
         return f"[Update Tournament] Table ID: {self.table_id} Button-Seat: {self.btn_seat}"
@@ -660,3 +662,14 @@ class CashOut(BaseAction):
 
     def __repr__(self) -> str:
         return f"[Cash Out] Player: {self.player} Amount: {self.amount}"
+
+
+class MockAction(BaseAction):
+    pattern = ""
+
+    def __init__(self, match=None):
+        pass
+
+    def execute(self, line=None):
+        pass
+        # print()
