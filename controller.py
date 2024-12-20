@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from round_of_actions_factory import parse_list_to_rounds_of_actions
 from file_io import parse_txt_to_list
+from replay_viewer import ReplayViewer
 
 if TYPE_CHECKING:
     from view import View
@@ -18,6 +19,7 @@ class Controller:
         self.view = view
         self.model = model
         self.init_view_buttons()
+        self.replay_viewer = None
 
     def init_view_buttons(self) -> None:
         """
@@ -27,6 +29,7 @@ class Controller:
         self.view.round_dropdown_on_change(self.select_round)
         self.view.prev_action_button_on_click(self.prev_action)
         self.view.next_action_button_on_click(self.next_action)
+        self.view.review_button_on_click(self.review_hand_history)
 
     def get_input_path(self, event) -> None:
         """
@@ -142,6 +145,17 @@ class Controller:
             self.set_action_button_activation_state()
             # self.print_to_view(content=self.active_round[self.action_index])
             self.del_text_from_view()
+
+    def review_hand_history(self, event) -> None:
+        if not self.active_round:
+            self.print_to_view(content="Please select a round first")
+        # elif self.replay_viewer is not None:
+        #    self.print_to_view(content="Review player already running")
+        else:
+            self.replay_viewer = ReplayViewer(hand_history=self.active_round)
+            self.replay_viewer.run()
+            self.replay_viewer = None
+        return "break"
 
     # def next_round(self) -> None:
     #    if self.round_number < len(self.all_rounds - 1):

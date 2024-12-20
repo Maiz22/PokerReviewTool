@@ -1,12 +1,44 @@
 import pygame
 import os
 from action import MockAction
+from game_components import Card, Stats, Button
+
+
+"""
+Determine total num of seats
+Create Seat -> give it coords at creation
+Create Player -> give it a seat
+add player to review tools dict of players
+through player change things
+"""
 
 
 class Player:
-    def __init__(self, name, stack) -> None:
+    def __init__(
+        self,
+        name: str,
+        seat: int,
+        stack: float | None = None,
+        cards: tuple[str, str] | None = None,
+        is_active: bool = False,
+    ) -> None:
         self.name = name
+        self.seat = seat
         self.stack = stack
+        self.cards = cards
+        self.is_active = is_active
+
+
+class Seat:
+    def __init__(self, coords: list[tuple, tuple]) -> None:
+        self.cards_coords = coords[0]
+        self.button_position = coords[1]
+
+    def draw(self) -> None:
+        pass
+
+    def update(self) -> None:
+        pass
 
 
 class Table:
@@ -26,12 +58,12 @@ class Table:
     def get_seat_positions(self) -> list[tuple[int, int]]:
         if self.total_seats == 6:
             return [
-                (40, 325),
-                (380, 60),
-                (780, 60),
-                (380, 570),
-                (780, 570),
-                (1120, 325),
+                [(40, 325), (155, 305)],
+                [(380, 40), (385, 160)],
+                [(780, 40), (785, 160)],
+                [(380, 570), (385, 450)],
+                [(780, 570), (785, 450)],
+                [(1120, 325), (965, 305)],
             ]
         elif self.total_seats == 8:
             pass
@@ -48,46 +80,8 @@ class Table:
             print("Too many players at the selected table")
 
 
-class Seat:
-    def __init__(self, player, position) -> None:
-        self.player = player
-
-    def draw(self) -> None:
-        pass
-
-    def update(self) -> None:
-        pass
-
-
-class Stats(pygame.sprite.Sprite):
-    def __init__(self) -> None:
-        super().__init__()
-        self.width = 120
-        self.height = 50
-        self.color = (220, 220, 220)
-
-    def draw(self, surface: pygame.Surface, x: int, y: int) -> None:
-        self.rect = pygame.Rect(x, y, self.width, self.height)
-        pygame.draw.rect(surface, self.color, self.rect)
-
-
-class Card(pygame.sprite.Sprite):
-    def __init__(self, image_path: str) -> None:
-        super().__init__()
-        self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (60, 90))
-
-    def draw(self, surface: pygame.Surface, image, position: tuple[int, int]) -> None:
-        self.rect = self.image.get_rect(topleft=position)
-        surface.blit(image, position)
-        return
-
-    def update(self) -> None:
-        pass
-
-
 class ReplayViewer:
-    def __init__(self, hand_history) -> None:
+    def __init__(self, hand_history: list) -> None:
         pygame.init()
         self.hand_history = hand_history
         self.geometry = (1280, 720)
@@ -97,6 +91,7 @@ class ReplayViewer:
         )
         self.background_img = pygame.transform.scale(self.background_img, self.geometry)
         self.card_images = self.pre_load_card_images()
+        self.player_to_seat = {}
 
         print(len(self.card_images))
 
@@ -115,10 +110,10 @@ class ReplayViewer:
     def setup_table(num_player: int = 6) -> None:
         pass
 
-    def pre_load_card_images(self) -> None:
+    def pre_load_card_images(self) -> dict[str:Card]:
         cards_dir = os.path.join(os.path.dirname(__file__), "images\cards")
         cards_dict = {
-            card.split(".")[0]: os.path.join(cards_dir, card)
+            card.split(".")[0]: Card(os.path.join(cards_dir, card))
             for card in os.listdir(cards_dir)
         }
         return cards_dict
@@ -130,22 +125,28 @@ class ReplayViewer:
         screen: pygame.Surface,
     ) -> None:
         card_width, card_height = 60, 90
-        card1 = Card(
-            x=position[0], y=position[1], image_path="images/{}".format(cards[0])
-        )
-        card2 = Card(
-            x=position[0] + card_width,
-            y=position[1],
-            image_path="images/{}".format(cards[0]),
-        )
-        cards = pygame.sprite.Group()
-        cards.add(card1, card2)
-        card1.update()
-        card2.update()
-        cards.draw(screen, position)
+        # card1 = Card(
+        #    x=position[0], y=position[1], image_path="images/{}".format(cards[0])
+        # )
+        # card2 = Card(
+        #    x=position[0] + card_width,
+        #    y=position[1],
+        #    image_path="images/{}".format(cards[0]),
+        # )
+        # cards = pygame.sprite.Group()
+        # cards.add(card1, card2)
+        # card1.update()
+        # card2.update()
+        # cards.draw(screen, position)
+        print(position)
+        b = Button("images/dealer.png")
+        b.draw(screen, (position[1][0], position[1][1]))
+        card1 = self.card_images["as"]
+        card2 = self.card_images["2s"]
+        card1.draw(screen, x=position[0][0], y=position[0][1])
+        card2.draw(screen, x=position[0][0] + 60, y=position[0][1])
         stats = Stats()
-        stats.draw(screen, position[0], position[1] + 90)
-        pygame.display.flip()
+        stats.draw(screen, position[0])
 
     def run(self) -> None:
         """
@@ -154,13 +155,14 @@ class ReplayViewer:
         self.main_surface = pygame.display.set_mode(self.geometry)
         self.main_surface.blit(self.background_img, (0, 0))
         pygame.display.flip()
+
         self.clock = pygame.time.Clock()
 
         # list of
         list_of_actions = [MockAction() for _ in range(10)]
-        action_index = 0
-        prev_index = None
+        action_index = None
 
+        # setupt table
         # total_seats = get_total_seats()
         total_seats = 6
         table = Table(total_seats=total_seats)
@@ -170,10 +172,6 @@ class ReplayViewer:
 
         while running:
 
-            if not prev_index == action_index:
-                print(action_index)
-            prev_index = action_index
-
             # check for inputs
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -181,32 +179,42 @@ class ReplayViewer:
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
-                        list_of_actions[action_index].execute()
                         print("key right")
-                        if action_index < (len(list_of_actions) - 1):
+                        if action_index is None:
+                            action_index = 0
+                        elif action_index < (len(list_of_actions) - 1):
                             action_index += 1
-                    if event.key == pygame.K_LEFT:
                         list_of_actions[action_index].execute()
+                        print(action_index)
+
+                    if event.key == pygame.K_LEFT:
                         print("key left")
-                        if action_index > 0:
+                        if action_index is None:
+                            action_index = 0
+                        elif action_index > 0:
                             action_index -= 1
+                        list_of_actions[action_index].execute()
+                        print(action_index)
+            seats = table.get_seat_positions()
 
-            # seats = [
-            #    (40, 325),
-            #    (380, 60),
-            #    (780, 60),
-            #    (380, 570),
-            #    (780, 570),
-            #   (1120, 325),
-            # ]
-            # for seat in seats:
-            #    self.draw_hand(
-            #        seat,
-            #       ("card-back_final.png", "card-back_final.png"),
-            #        screen=self.main_surface,
-            #   )
+            #            seats = [
+            #                (40, 325),
+            #                (380, 40),
+            #                (780, 40),
+            #                (380, 570),
+            #                (780, 570),
+            #                (1120, 325),
+            #            ]
+            for seat in seats:
+                print(seat)
+                self.draw_hand(
+                    seat,
+                    ("card-back_final.png", "card-back_final.png"),
+                    screen=self.main_surface,
+                )
+            pygame.display.flip()
 
-            self.main_surface.blit(self.background_img, (0, 0))
+            # self.main_surface.blit(self.background_img, (0, 0))
             self.clock.tick(self.max_fps)
 
         pygame.quit()

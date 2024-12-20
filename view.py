@@ -28,6 +28,8 @@ class View(tk.Tk):
         self.prev_button.pack(side="left", padx=5)
         self.next_button = tk.Button(self.setup_frame, state="disabled", text="Next")
         self.next_button.pack(side="left", padx=5)
+        self.review_button = tk.Button(self.setup_frame, text="Review...")
+        self.review_button.pack(side="left", padx=10)
 
         self.text_frame = tk.Frame(self)
         self.text_frame.pack(fill="both", expand=True)
@@ -46,13 +48,9 @@ class View(tk.Tk):
     def prev_action_button_on_click(self, callback) -> None:
         self.prev_button.bind("<Button-1>", callback)
 
+    def review_button_on_click(self, callback) -> None:
+        self.review_button.bind("<Button-1>", callback)
+
     def open_txt_file(self) -> str:
         file_path = askopenfilename(filetypes=[("Text file", ".txt")])
         return file_path
-
-        # self.canvas = tk.Canvas(self.main_frame, width=960, height=540)
-        # self.canvas.pack(fill="both", expand=True)
-        # self.image = Image.open("images/poker_table.jpg")
-        # self.resized = self.image.resize((960, 540))
-        # self.tk_image = ImageTk.PhotoImage(image=self.resized)
-        # self.canvas.create_image(0, 0, image=self.tk_image, anchor="nw")
