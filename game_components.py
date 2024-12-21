@@ -6,11 +6,22 @@ class Stats:
         self.width = 120
         self.height = 50
         self.color = (220, 220, 220)
+        self.name_text = pygame.font.SysFont("Arial", 12)
+        self.stack_text = pygame.font.SysFont("Arial", 12)
 
-    def draw(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
+    def draw_rect(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
         self.rect = pygame.Rect(position[0], position[1] + 90, self.width, self.height)
         pygame.draw.rect(surface, self.color, self.rect)
-        return
+
+    def update_name(
+        self, surface: pygame.Surface, position: tuple[int, int], content: str
+    ) -> None:
+        surface.blit(self.name_text.render(content, True, (255, 255, 255)), position)
+
+    def update_stack(
+        self, surface: pygame.Surface, position: tuple[int, int], content: str
+    ) -> None:
+        surface.blit(self.stack_text.render(content, True, (255, 255, 255)), position)
 
 
 class Card:

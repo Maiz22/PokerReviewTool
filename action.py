@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from action_registry import ActionRegistry
 
+from replay_viewer import Player, Seat
+
 if TYPE_CHECKING:
     import re
     import pygame
@@ -31,13 +33,15 @@ class UpdateSeat(BaseAction):
     pattern = r"^Seat (\d{1}): (.+) \((.+) in chips\)"
 
     def __init__(self, match: re.Match) -> None:
-        self.seat_number = match[1]
+        self.seat_number = int(match[1])
         self.player = match[2]
-        self.stack = match[3]
+        self.stack = float(match[3])
 
-    def execute(self, surface: pygame.Surface):
+    def execute(self, parent):
+        parent.player_dict[self.player] = Player(name=self.player, stack=self.stack)
+        parent.player_dict[self.player].take_seat(parent.seat_dict, self.seat_number)
+        print(parent.player_dict[self.player])
         # player = Player(name=self.player, stack=self.stack, seat= self.seat_number)
-        pass
 
     def __repr__(self):
         return f"[Action:UpdateSeat] Player: {self.player} - Seat: {self.seat_number} -Stack: {self.stack}"
@@ -583,8 +587,8 @@ class UpdateTournament(BaseAction):
         self.hand_id = match[1]
         self.tournament_id = match[2]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("updating tournament")
 
     def __repr__(self) -> str:
         return f"\n[Update Tournament] Hand: {self.hand_id} Tournament: {self.tournament_id}"
@@ -606,18 +610,21 @@ class UpdateCashGame(BaseAction):
 
 
 @ActionRegistry.register()
-class UpdateTable(BaseAction):
+class SetDealerButton(BaseAction):
     pattern = r"^Table '(.+ *.*)' \d+-max Seat #(\d+) is the button"
 
     def __init__(self, match: Match) -> None:
         self.table_id = match[1]
-        self.btn_seat = match[2]
+        self.btn_seat = int(match[2])
 
-    def execute(self, positions: list[tuple[int, int]], seats: dict) -> None:
-        pass
+    def execute(self, parent) -> None:
+        print("set dealer")
+        parent.seat_dict[self.btn_seat].draw_dealer_button(parent.main_surface)
 
     def __repr__(self) -> str:
-        return f"[Update Tournament] Table ID: {self.table_id} Button-Seat: {self.btn_seat}"
+        return (
+            f"[SetDealerButton] Table ID: {self.table_id} Button-Seat: {self.btn_seat}"
+        )
 
 
 @ActionRegistry.register()
