@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from action_registry import ActionRegistry
 
-from replay_viewer import Player, Seat
+from game_components import Player, Seat, Stats
 
 if TYPE_CHECKING:
     import re
@@ -24,7 +24,7 @@ class BaseAction(ABC):
         pass
 
     @abstractmethod
-    def execute(self, line: str):
+    def execute(self, parent):
         pass
 
 
@@ -38,9 +38,15 @@ class UpdateSeat(BaseAction):
         self.stack = float(match[3])
 
     def execute(self, parent):
+        """
+        Seat player at the table by creating player instance and calling
+        the take_seat method.
+        """
         parent.player_dict[self.player] = Player(name=self.player, stack=self.stack)
         parent.player_dict[self.player].take_seat(parent.seat_dict, self.seat_number)
+        parent.player_dict[self.player].draw_name(parent.main_surface)
         print(parent.player_dict[self.player])
+
         # player = Player(name=self.player, stack=self.stack, seat= self.seat_number)
 
     def __repr__(self):
@@ -55,8 +61,8 @@ class PlaceAnte(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:PlaceAnte] Player: {self.player} Ante: {self.amount}"
@@ -70,8 +76,8 @@ class DealCards(BaseAction):
         self.player = match[1]
         self.cards = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:DealCards] Player: {self.player} Cards: {self.cards}"
@@ -85,8 +91,8 @@ class Bet(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        pass
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:Bet] Player: {self.player} Amount: {self.amount}"
@@ -100,8 +106,8 @@ class UncalledBet(BaseAction):
         self.player = match[2]
         self.amount = match[1]
 
-    def execute(self):
-        pass
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:UncalledBet] Returned to Player: {self.player} Amount: {self.amount}"
@@ -116,8 +122,8 @@ class Raise(BaseAction):
         self.amount_from = match[2]
         self.amount_to = match[3]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Raise] Player: {self.player} Amount: {self.amount_from} -> {self.amount_to}"
@@ -130,8 +136,8 @@ class Check(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        pass
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Check] Player: {self.player}"
@@ -145,8 +151,8 @@ class Call(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Call] Player: {self.player} Amount: {self.amount}"
@@ -159,8 +165,8 @@ class Fold(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        pass
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Fold] Player: {self.player}"
@@ -173,8 +179,8 @@ class StageHoleCards(BaseAction):
     def __init__(self, match) -> None:
         self.name = "HOLE CARDS"
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name}"
@@ -187,8 +193,8 @@ class StageShowDown(BaseAction):
     def __init__(self, match) -> None:
         self.name = "SHOW DOWN"
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name}"
@@ -201,8 +207,8 @@ class StageSummary(BaseAction):
     def __init__(self, match) -> None:
         self.name = "SUMMARY"
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name}"
@@ -216,8 +222,8 @@ class StageFlop(BaseAction):
         self.name = "FLOP"
         self.cards = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name} Cards: {self.cards}"
@@ -231,8 +237,8 @@ class StageTurn(BaseAction):
         self.name = "TURN"
         self.cards = match[1] + " " + match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name} Cards: {self.cards}"
@@ -246,8 +252,8 @@ class StageRiver(BaseAction):
         self.name = "RIVER"
         self.cards = match[1] + " " + match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name} Cards: {self.cards}"
@@ -261,8 +267,8 @@ class PlaceSB(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:PlaceSB] Player: {self.player} Amount: {self.amount}"
@@ -276,8 +282,8 @@ class PlaceBB(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:PlaceSB] Player: {self.player} Amount: {self.amount}"
@@ -291,8 +297,8 @@ class ShowCards(BaseAction):
         self.player = match[1]
         self.cards = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Show] Player: {self.player} Cards: {self.cards}"
@@ -306,8 +312,8 @@ class Collect(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Collect] Player: {self.player} Amount: {self.amount}"
@@ -320,8 +326,8 @@ class Muck(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Muck] Player: {self.player}"
@@ -334,8 +340,8 @@ class DoesntShow(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:Doesn't show] Player: {self.player}"
@@ -349,8 +355,8 @@ class TotalPot(BaseAction):
         self.amount = match[1]
         self.rake = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Action:TotalPot] Amount: {self.amount} Rake: {self.rake}"
@@ -367,8 +373,8 @@ class SummaryTotalPotSplit(BaseAction):
         self.side_pot = match[3]
         self.rake = match[4]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Summary: TotalPotSplit] Total Pot: {self.total_pot} Main Pot: {self.main_pot} Side Pot: {self.side_pot} Rake: {self.rake}"
@@ -382,8 +388,8 @@ class SummaryCollected(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Summary: Collected] Player: {self.player} Amount: {self.amount}"
@@ -398,8 +404,8 @@ class SummaryCollectedSplitPot(BaseAction):
         self.amount = match[2]
         self.pot = match[3]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Summary: Collected Split] Player:{self.player} Amount:{self.amount} Pot:{self.pot}"
@@ -412,8 +418,8 @@ class SummaryFolded(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Summary: Folded] Player: {self.player}"
@@ -428,8 +434,8 @@ class SummaryShowedWon(BaseAction):
         self.cards = match[2]
         self.amount = match[3]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Summary: Showed Won] Player: {self.player} Cards: {self.cards} Amount:{self.amount}"
@@ -443,8 +449,8 @@ class SummaryShowedLost(BaseAction):
         self.player = match[1]
         self.cards = match[2]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self):
         return f"[Summary: Showed Lost] Player: {self.player} Cards: {self.cards}"
@@ -459,8 +465,8 @@ class SummaryMucked(BaseAction):
         self.player = match[1]
         self.hand = match[2]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Summary: Mucked] Player: {self.player} Hand: {self.hand}"
@@ -473,8 +479,8 @@ class SummaryBoard(BaseAction):
     def __init__(self, match) -> None:
         self.board = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Summary: Board] Cards: {self.board}"
@@ -487,8 +493,8 @@ class SummaryFinished(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Summary: Finished] Player: {self.player}"
@@ -501,8 +507,8 @@ class TournamentWin(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Final Winner] Player: {self.player}"
@@ -515,8 +521,8 @@ class TimeOut(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[TimeOut] Player: {self.player}"
@@ -529,8 +535,8 @@ class SitOut(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self):
-        return super().execute()
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[SitOut] Player: {self.player}"
@@ -543,8 +549,8 @@ class Returned(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Returned] Player: {self.player}"
@@ -557,8 +563,8 @@ class Disconnected(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Disconnected] Player: {self.player}"
@@ -571,8 +577,8 @@ class Connected(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Connected] Player: {self.player}"
@@ -588,7 +594,7 @@ class UpdateTournament(BaseAction):
         self.tournament_id = match[2]
 
     def execute(self, parent):
-        print("updating tournament")
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"\n[Update Tournament] Hand: {self.hand_id} Tournament: {self.tournament_id}"
@@ -602,8 +608,8 @@ class UpdateCashGame(BaseAction):
     def __init__(self, match: Match) -> None:
         self.hand_id = match[1]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Update Cash Game] Hand ID: {self.hand_id}"
@@ -634,8 +640,8 @@ class PlayAfterBtn(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[PlayAfterBtn] Player: {self.player}"
@@ -649,8 +655,8 @@ class PlayerChat(BaseAction):
         self.player = match[1]
         self.chat = match[2]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Chat] Player: {self.player} Content: {self.chat}"
@@ -664,8 +670,8 @@ class CashOut(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, line: str):
-        return super().execute(line)
+    def execute(self, parent):
+        print("Action not implemented")
 
     def __repr__(self) -> str:
         return f"[Cash Out] Player: {self.player} Amount: {self.amount}"
