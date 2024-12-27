@@ -37,7 +37,7 @@ class UpdateSeat(BaseAction):
         self.player = match[2]
         self.stack = float(match[3])
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         """
         Seat player at the table by creating player instance and calling
         the take_seat method.
@@ -45,6 +45,7 @@ class UpdateSeat(BaseAction):
         parent.player_dict[self.player] = Player(name=self.player, stack=self.stack)
         parent.player_dict[self.player].take_seat(parent.seat_dict, self.seat_number)
         parent.player_dict[self.player].draw_name(parent.main_surface)
+        parent.player_dict[self.player].update_stack(parent.main_surface)
         print(parent.player_dict[self.player])
 
         # player = Player(name=self.player, stack=self.stack, seat= self.seat_number)
@@ -61,8 +62,11 @@ class PlaceAnte(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.player_dict[self.player].update_stack(
+            parent.main_surface, difference=-float(self.amount)
+        )
+        parent.pot.update_pot(parent.main_surface, float(self.amount))
 
     def __repr__(self):
         return f"[Action:PlaceAnte] Player: {self.player} Ante: {self.amount}"
@@ -76,8 +80,15 @@ class DealCards(BaseAction):
         self.player = match[1]
         self.cards = match[2]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        cards = self.cards.split(" ")
+        parent.player_dict[self.player].draw_cards(
+            parent.main_surface,
+            cards=(
+                parent.card_images[cards[0].lower()],
+                parent.card_images[cards[1].lower()],
+            ),
+        )
 
     def __repr__(self):
         return f"[Action:DealCards] Player: {self.player} Cards: {self.cards}"
@@ -91,7 +102,7 @@ class Bet(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -106,7 +117,7 @@ class UncalledBet(BaseAction):
         self.player = match[2]
         self.amount = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -122,8 +133,11 @@ class Raise(BaseAction):
         self.amount_from = match[2]
         self.amount_to = match[3]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.player_dict[self.player].update_stack(
+            parent.main_surface, difference=-float(self.amount_to)
+        )
+        parent.pot.update_pot(parent.main_surface, float(self.amount_to))
 
     def __repr__(self):
         return f"[Action:Raise] Player: {self.player} Amount: {self.amount_from} -> {self.amount_to}"
@@ -136,7 +150,7 @@ class Check(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -151,8 +165,11 @@ class Call(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.player_dict[self.player].update_stack(
+            parent.main_surface, difference=-float(self.amount)
+        )
+        parent.pot.update_pot(parent.main_surface, float(self.amount))
 
     def __repr__(self):
         return f"[Action:Call] Player: {self.player} Amount: {self.amount}"
@@ -165,8 +182,14 @@ class Fold(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.player_dict[self.player].draw_cards(
+            parent.main_surface,
+            cards=(
+                parent.card_images["card-back-inactive"],
+                parent.card_images["card-back-inactive"],
+            ),
+        )
 
     def __repr__(self):
         return f"[Action:Fold] Player: {self.player}"
@@ -179,8 +202,15 @@ class StageHoleCards(BaseAction):
     def __init__(self, match) -> None:
         self.name = "HOLE CARDS"
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        for player in parent.player_dict.values():
+            player.draw_cards(
+                parent.main_surface,
+                cards=(
+                    parent.card_images["card-back"],
+                    parent.card_images["card-back"],
+                ),
+            )
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name}"
@@ -193,7 +223,7 @@ class StageShowDown(BaseAction):
     def __init__(self, match) -> None:
         self.name = "SHOW DOWN"
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -207,7 +237,7 @@ class StageSummary(BaseAction):
     def __init__(self, match) -> None:
         self.name = "SUMMARY"
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -222,8 +252,16 @@ class StageFlop(BaseAction):
         self.name = "FLOP"
         self.cards = match[1]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        cards = self.cards.split(" ")
+        parent.pot.deal_flop(
+            parent.main_surface,
+            cards=(
+                parent.card_images[cards[0].lower()],
+                parent.card_images[cards[1].lower()],
+                parent.card_images[cards[2].lower()],
+            ),
+        )
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name} Cards: {self.cards}"
@@ -235,10 +273,13 @@ class StageTurn(BaseAction):
 
     def __init__(self, match) -> None:
         self.name = "TURN"
+        self.card = match[2]
         self.cards = match[1] + " " + match[2]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.pot.deal_turn(
+            surface=parent.main_surface, card=parent.card_images[self.card]
+        )
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name} Cards: {self.cards}"
@@ -250,10 +291,13 @@ class StageRiver(BaseAction):
 
     def __init__(self, match) -> None:
         self.name = "RIVER"
+        self.card = match[2]
         self.cards = match[1] + " " + match[2]
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.pot.deal_river(
+            surface=parent.main_surface, card=parent.card_images[self.card]
+        )
 
     def __repr__(self) -> str:
         return f"[Action:ChangeStage] {self.name} Cards: {self.cards}"
@@ -265,10 +309,13 @@ class PlaceSB(BaseAction):
 
     def __init__(self, match) -> None:
         self.player = match[1]
-        self.amount = match[2]
+        self.amount = float(match[2])
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.player_dict[self.player].update_stack(
+            surface=parent.main_surface, difference=-self.amount
+        )
+        parent.pot.update_pot(surface=parent.main_surface, chips=self.amount)
 
     def __repr__(self):
         return f"[Action:PlaceSB] Player: {self.player} Amount: {self.amount}"
@@ -280,10 +327,13 @@ class PlaceBB(BaseAction):
 
     def __init__(self, match) -> None:
         self.player = match[1]
-        self.amount = match[2]
+        self.amount = float(match[2])
 
-    def execute(self, parent):
-        print("Action not implemented")
+    def execute(self, parent, forward: bool = True):
+        parent.player_dict[self.player].update_stack(
+            surface=parent.main_surface, difference=-self.amount
+        )
+        parent.pot.update_pot(surface=parent.main_surface, chips=self.amount)
 
     def __repr__(self):
         return f"[Action:PlaceSB] Player: {self.player} Amount: {self.amount}"
@@ -297,7 +347,7 @@ class ShowCards(BaseAction):
         self.player = match[1]
         self.cards = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -312,7 +362,7 @@ class Collect(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -326,7 +376,7 @@ class Muck(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -340,7 +390,7 @@ class DoesntShow(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -355,7 +405,7 @@ class TotalPot(BaseAction):
         self.amount = match[1]
         self.rake = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -373,7 +423,7 @@ class SummaryTotalPotSplit(BaseAction):
         self.side_pot = match[3]
         self.rake = match[4]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -388,7 +438,7 @@ class SummaryCollected(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -404,7 +454,7 @@ class SummaryCollectedSplitPot(BaseAction):
         self.amount = match[2]
         self.pot = match[3]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -418,7 +468,7 @@ class SummaryFolded(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -434,7 +484,7 @@ class SummaryShowedWon(BaseAction):
         self.cards = match[2]
         self.amount = match[3]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -449,7 +499,7 @@ class SummaryShowedLost(BaseAction):
         self.player = match[1]
         self.cards = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self):
@@ -465,7 +515,7 @@ class SummaryMucked(BaseAction):
         self.player = match[1]
         self.hand = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -479,7 +529,7 @@ class SummaryBoard(BaseAction):
     def __init__(self, match) -> None:
         self.board = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -493,7 +543,7 @@ class SummaryFinished(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -507,7 +557,7 @@ class TournamentWin(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -521,7 +571,7 @@ class TimeOut(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -535,7 +585,7 @@ class SitOut(BaseAction):
     def __init__(self, match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -549,7 +599,7 @@ class Returned(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -563,7 +613,7 @@ class Disconnected(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -577,7 +627,7 @@ class Connected(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -593,7 +643,7 @@ class UpdateTournament(BaseAction):
         self.hand_id = match[1]
         self.tournament_id = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -608,7 +658,7 @@ class UpdateCashGame(BaseAction):
     def __init__(self, match: Match) -> None:
         self.hand_id = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -640,7 +690,7 @@ class PlayAfterBtn(BaseAction):
     def __init__(self, match: Match) -> None:
         self.player = match[1]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -655,7 +705,7 @@ class PlayerChat(BaseAction):
         self.player = match[1]
         self.chat = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:
@@ -670,7 +720,7 @@ class CashOut(BaseAction):
         self.player = match[1]
         self.amount = match[2]
 
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
         print("Action not implemented")
 
     def __repr__(self) -> str:

@@ -2,7 +2,7 @@ import pygame
 import os
 
 # from action import MockAction
-from game_components import Card, Stats, Table
+from game_components import Card, Stats, Table, Pot
 
 
 """
@@ -91,6 +91,8 @@ class ReplayViewer:
         total_seats = 9
         table = Table(total_seats=total_seats)
         self.seat_dict = table.create_seats()
+        self.pot = Pot()
+        self.pot.update_pot(self.main_surface)
 
         for seat in self.seat_dict.values():
             seat.draw_frame(self.main_surface)
@@ -133,9 +135,9 @@ class ReplayViewer:
                         print("key left")
                         if action_index is None:
                             action_index = 0
-                        # elif action_index > 0:
-                        #    action_index -= 1
-                        self.hand_history[action_index].execute()
+                        elif action_index > 0:
+                            action_index -= 1
+                        self.hand_history[action_index].execute(parent=self)
                         print(action_index)
 
                     pygame.display.flip()

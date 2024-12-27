@@ -2,11 +2,57 @@ import pygame
 from config import TABLE_COORDS
 
 
+class Card:
+    def __init__(self, image_path: str) -> None:
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (60, 90))
+
+    def draw(self, surface: pygame.Surface, x: int, y: int) -> None:
+        self.rect = self.image.get_rect(topleft=(x, y))
+        surface.blit(self.image, self.rect)
+        return
+
+    def update(self) -> None:
+        pass
+
+
+class Button:
+    def __init__(self, image_path) -> None:
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (110, 110))
+
+    def draw(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
+        self.rect = self.image.get_rect(topleft=(position[0], position[1]))
+        surface.blit(self.image, self.rect)
+        return
+
+
+class Seat:
+    def __init__(self, num: int, card_coords: tuple, button_coords: tuple) -> None:
+        self.num = num
+        self.card_coords = card_coords
+        self.button_position = button_coords
+        self.stat_coords = (card_coords[0], card_coords[1] + 90)
+        self.width = 120
+        self.height = 50
+        # self.is_button = False
+
+    def draw_frame(self, surface: pygame.Surface) -> None:
+        self.rect = pygame.Rect(
+            self.stat_coords[0], self.stat_coords[1], self.width, self.height
+        )
+        pygame.draw.rect(surface, (255, 255, 255), self.rect)
+
+    def draw_dealer_button(self, surface: pygame.Surface) -> None:
+        button = Button("images/dealer.png")
+        button.draw(surface, self.button_position)
+
+
 class Player:
     def __init__(
         self,
         name: str,
-        seat=None,
+        seat: Seat = None,
         stack: float | None = None,
         cards: tuple[str, str] | None = None,
         is_active: bool = False,
@@ -25,39 +71,29 @@ class Player:
         self.seat = seat_dict[seat]
 
     def draw_name(self, surface: pygame.Surface) -> None:
-        surface.blit(
-            self.font.render(self.name, True, (255, 0, 0)), self.seat.stat_coords
-        )
+        x, y = self.seat.stat_coords
+        surface.blit(self.font.render(self.name, True, (255, 0, 0)), (x, y))
 
-    def update_stack(self) -> None:
-        pass
+    def update_stack(self, surface: pygame.Surface, difference: float = None) -> None:
+        x, y = self.seat.stat_coords[0], self.seat.stat_coords[1] + 20
+        rect = pygame.Rect(x, y, 120, 30)
+        pygame.draw.rect(surface, (255, 255, 255), rect)
+        if difference:
+            self.stack += difference
+        surface.blit(self.font.render(str(self.stack), True, (0, 0, 0)), (x, y))
+
+    def draw_cards(
+        self,
+        surface: pygame.Surface,
+        cards: tuple[Card, Card],
+    ) -> None:
+        x, y = self.seat.card_coords
+        card1, card2 = cards
+        card1.draw(surface=surface, x=x, y=y)
+        card2.draw(surface=surface, x=x + 60, y=y)
 
     def __repr__(self) -> str:
         return "Name:{} Stack: {} Seat: {}".format(self.name, self.stack, self.seat.num)
-
-
-class Seat:
-    def __init__(self, num: int, card_coords: tuple, button_coords: tuple) -> None:
-        self.num = num
-        self.cards_coords = card_coords
-        self.button_position = button_coords
-        self.stat_coords = (card_coords[0], card_coords[1] + 90)
-        self.width = 120
-        self.height = 140
-        # self.is_button = False
-
-    def draw_frame(self, surface: pygame.Surface) -> None:
-        self.rect = pygame.Rect(
-            self.cards_coords[0], self.cards_coords[1], self.width, self.height
-        )
-        pygame.draw.rect(surface, (255, 255, 255), self.rect)
-
-    def draw_dealer_button(self, surface: pygame.Surface) -> None:
-        button = Button("images/dealer.png")
-        button.draw(surface, self.button_position)
-
-    def draw_cards(self, surface: pygame.Surface, cards: tuple[str, str]) -> None:
-        pass
 
 
 class Table:
@@ -122,26 +158,33 @@ class Stats:
         surface.blit(self.stack_text.render(content, True, (255, 255, 255)), (x, y))
 
 
-class Card:
-    def __init__(self, image_path: str) -> None:
-        self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (60, 90))
+class Pot:
+    def __init__(self) -> None:
+        self.total_chips = 0
+        self.coords = (380, 300)
+        self.font = pygame.font.SysFont("Arial", 16)
+        self.horizontal_space = 70
 
-    def draw(self, surface: pygame.Surface, x: int, y: int) -> None:
-        self.rect = self.image.get_rect(topleft=(x, y))
-        surface.blit(self.image, self.rect)
-        return
+    def deal_flop(
+        self, surface: pygame.Surface, cards: tuple[Card, Card, Card]
+    ) -> None:
+        x, y = self.coords
+        for card in cards:
+            card.draw(surface=surface, x=x, y=y)
+            x += self.horizontal_space
 
-    def update(self) -> None:
-        pass
+    def deal_turn(self, surface: pygame.Surface, card: Card) -> None:
+        x, y = self.coords
+        card.draw(surface=surface, x=x + 3 * self.horizontal_space, y=y)
 
+    def deal_river(self, surface: pygame.Surface, card: Card) -> None:
+        x, y = self.coords
+        card.draw(surface=surface, x=x + 4 * self.horizontal_space, y=y)
 
-class Button:
-    def __init__(self, image_path) -> None:
-        self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (110, 110))
-
-    def draw(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
-        self.rect = self.image.get_rect(topleft=(position[0], position[1]))
-        surface.blit(self.image, self.rect)
-        return
+    def update_pot(self, surface: pygame.Surface, chips: float = None) -> None:
+        x, y = self.coords
+        if chips:
+            self.total_chips += chips
+        rect = pygame.Rect(x + 400, y, 60, 30)
+        pygame.draw.rect(surface, (255, 255, 255), rect)
+        surface.blit(self.font.render(str(self.total_chips), True, (0, 0, 0)), (x, y))
