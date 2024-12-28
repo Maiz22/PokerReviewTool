@@ -345,7 +345,14 @@ class ShowCards(BaseAction):
         self.cards = match[2]
 
     def execute(self, parent, forward: bool = True):
-        print("Action not implemented")
+        cards = self.cards.split(" ")
+        parent.player_dict[self.player].draw_cards(
+            parent.main_surface,
+            cards=(
+                parent.card_images[cards[0].lower()],
+                parent.card_images[cards[1].lower()],
+            ),
+        )
 
     def __repr__(self):
         return f"[Action:Show] Player: {self.player} Cards: {self.cards}"

@@ -5,7 +5,8 @@ from config import TABLE_COORDS
 class Card:
     def __init__(self, image_path: str) -> None:
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (60, 90))
+        self.width, self.height = self.image.get_width(), self.image.get_height()
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
     def draw(self, surface: pygame.Surface, x: int, y: int) -> None:
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -19,7 +20,7 @@ class Card:
 class Button:
     def __init__(self, image_path) -> None:
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (110, 110))
+        self.image = pygame.transform.scale(self.image, (80, 80))
 
     def draw(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
         self.rect = self.image.get_rect(topleft=(position[0], position[1]))
@@ -35,13 +36,12 @@ class Seat:
         self.stat_coords = (card_coords[0], card_coords[1] + 90)
         self.width = 120
         self.height = 50
-        # self.is_button = False
 
     def draw_frame(self, surface: pygame.Surface) -> None:
         self.rect = pygame.Rect(
             self.stat_coords[0], self.stat_coords[1], self.width, self.height
         )
-        pygame.draw.rect(surface, (255, 255, 255), self.rect)
+        pygame.draw.rect(surface, (255, 255, 255), self.rect, border_radius=5)
 
     def draw_dealer_button(self, surface: pygame.Surface) -> None:
         button = Button("images/dealer.png")
@@ -55,13 +55,12 @@ class Player:
         seat: Seat = None,
         stack: float | None = None,
         cards: tuple[str, str] | None = None,
-        is_active: bool = False,
     ) -> None:
         self.name = name
         self.seat = seat
         self.stack = stack
         self.cards = cards
-        self.font = pygame.font.SysFont("Arial", 16)
+        self.font = pygame.font.SysFont("Sans-Serif", 20)
 
     def take_seat(self, seat_dict: dict, seat: int) -> None:
         """
@@ -72,15 +71,17 @@ class Player:
 
     def draw_name(self, surface: pygame.Surface) -> None:
         x, y = self.seat.stat_coords
-        surface.blit(self.font.render(self.name, True, (255, 0, 0)), (x + 5, y + 5))
+        surface.blit(self.font.render(self.name, True, (0, 0, 0)), (x + 5, y + 5))
 
     def update_stack(self, surface: pygame.Surface, difference: float = None) -> None:
-        x, y = self.seat.stat_coords[0], self.seat.stat_coords[1] + 20
-        rect = pygame.Rect(x, y, 120, 30)
-        pygame.draw.rect(surface, (255, 255, 255), rect)
+        x, y = self.seat.stat_coords[0], self.seat.stat_coords[1] + 22
+        rect = pygame.Rect(x, y, 120, 26)
+        pygame.draw.rect(surface, (255, 255, 255), rect, border_radius=3)
         if difference:
             self.stack += difference
-        surface.blit(self.font.render(str(self.stack), True, (0, 0, 0)), (x + 5, y + 5))
+        surface.blit(
+            self.font.render(f"{str(self.stack)}$", True, (0, 0, 0)), (x + 5, y + 5)
+        )
 
     def draw_cards(
         self,
@@ -169,7 +170,7 @@ class Pot:
     def __init__(self) -> None:
         self.total_chips = 0
         self.coords = (380, 300)
-        self.font = pygame.font.SysFont("Arial", 16)
+        self.font = pygame.font.SysFont("Sans-Serif", 20)
         self.horizontal_space = 70
 
     def deal_flop(
@@ -192,14 +193,14 @@ class Pot:
         x, y = self.coords
         if chips:
             self.total_chips += chips
-        rect = pygame.Rect(x + 400, y, 60, 30)
-        pygame.draw.rect(surface, (255, 255, 255), rect)
+        rect = pygame.Rect(x + 400, y, 80, 30)
+        pygame.draw.rect(surface, (255, 255, 255), rect, border_radius=3)
         surface.blit(
-            self.font.render(str(self.total_chips), True, (0, 0, 0)),
-            (x + 410, y + 5),
+            self.font.render(f"{str(self.total_chips)}$", True, (0, 0, 0)),
+            (x + 410, y + 8),
         )
 
 
-class ActionDesctiption:
+class ActionDescription:
     def __init__(self):
         pass
