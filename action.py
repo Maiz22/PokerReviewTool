@@ -46,9 +46,6 @@ class UpdateSeat(BaseAction):
         parent.player_dict[self.player].take_seat(parent.seat_dict, self.seat_number)
         parent.player_dict[self.player].draw_name(parent.main_surface)
         parent.player_dict[self.player].update_stack(parent.main_surface)
-        print(parent.player_dict[self.player])
-
-        # player = Player(name=self.player, stack=self.stack, seat= self.seat_number)
 
     def __repr__(self):
         return f"[Action:UpdateSeat] Player: {self.player} - Seat: {self.seat_number} -Stack: {self.stack}"
@@ -126,7 +123,7 @@ class UncalledBet(BaseAction):
 
 @ActionRegistry.register()
 class Raise(BaseAction):
-    pattern = r"^(.+): raises (.+) to (.+)"
+    pattern = r"^(.+): raises (\d+) to (\d+)"
 
     def __init__(self, match) -> None:
         self.player = match[1]
@@ -159,7 +156,7 @@ class Check(BaseAction):
 
 @ActionRegistry.register()
 class Call(BaseAction):
-    pattern = r"^(.+): calls (.+)"
+    pattern = r"^(.+): calls (d\+)"
 
     def __init__(self, match) -> None:
         self.player = match[1]
@@ -278,7 +275,7 @@ class StageTurn(BaseAction):
 
     def execute(self, parent, forward: bool = True):
         parent.pot.deal_turn(
-            surface=parent.main_surface, card=parent.card_images[self.card]
+            surface=parent.main_surface, card=parent.card_images[self.card.lower()]
         )
 
     def __repr__(self) -> str:
@@ -296,7 +293,7 @@ class StageRiver(BaseAction):
 
     def execute(self, parent, forward: bool = True):
         parent.pot.deal_river(
-            surface=parent.main_surface, card=parent.card_images[self.card]
+            surface=parent.main_surface, card=parent.card_images[self.card.lower()]
         )
 
     def __repr__(self) -> str:

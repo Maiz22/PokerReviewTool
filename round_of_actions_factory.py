@@ -22,7 +22,7 @@ def parse_list_to_rounds_of_actions(txt_list: list[str]):
     linebreak_counter = 0
     for i, line in enumerate(txt_list):
         if line == "\n":
-            if linebreak_counter == 3:
+            if linebreak_counter == 2:
                 rounds.append(single_round)
                 single_round = []
                 linebreak_counter = 0

@@ -80,6 +80,7 @@ class Controller:
         else:
             self.view.round_number_dropdown.configure(values=[])
             self.view.round_number_var.set("")
+        print(self.all_rounds)
         return "break"
 
     def create_summary(
@@ -143,14 +144,13 @@ class Controller:
         if not self.action_index is None and self.action_index > 0:
             self.action_index -= 1
             self.set_action_button_activation_state()
-            # self.print_to_view(content=self.active_round[self.action_index])
             self.del_text_from_view()
 
     def review_hand_history(self, event) -> None:
         if not self.active_round:
             self.print_to_view(content="Please select a round first")
-        # elif self.replay_viewer is not None:
-        #    self.print_to_view(content="Review player already running")
+        elif self.replay_viewer is not None:
+            self.print_to_view(content="Review player already running")
         else:
             self.replay_viewer = ReplayViewer(hand_history=self.active_round)
             self.replay_viewer.run()

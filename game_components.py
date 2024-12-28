@@ -72,7 +72,7 @@ class Player:
 
     def draw_name(self, surface: pygame.Surface) -> None:
         x, y = self.seat.stat_coords
-        surface.blit(self.font.render(self.name, True, (255, 0, 0)), (x, y))
+        surface.blit(self.font.render(self.name, True, (255, 0, 0)), (x + 5, y + 5))
 
     def update_stack(self, surface: pygame.Surface, difference: float = None) -> None:
         x, y = self.seat.stat_coords[0], self.seat.stat_coords[1] + 20
@@ -80,7 +80,7 @@ class Player:
         pygame.draw.rect(surface, (255, 255, 255), rect)
         if difference:
             self.stack += difference
-        surface.blit(self.font.render(str(self.stack), True, (0, 0, 0)), (x, y))
+        surface.blit(self.font.render(str(self.stack), True, (0, 0, 0)), (x + 5, y + 5))
 
     def draw_cards(
         self,
@@ -140,6 +140,7 @@ class Stats:
         self.color = (220, 220, 220)
         self.name_text = pygame.font.SysFont("Arial", 12)
         self.stack_text = pygame.font.SysFont("Arial", 12)
+        self.padx = 10
 
     def draw_rect(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
         self.rect = pygame.Rect(position[0], position[1] + 90, self.width, self.height)
@@ -149,13 +150,19 @@ class Stats:
         self, surface: pygame.Surface, position: tuple[int, int], content: str
     ) -> None:
         x, y = position[0], position[1] + 90
-        surface.blit(self.name_text.render(content, True, (255, 255, 255)), (x, y))
+        surface.blit(
+            self.name_text.render(content, True, (255, 255, 255)),
+            dest=(x + self.padx, y),
+        )
 
     def update_stack(
         self, surface: pygame.Surface, position: tuple[int, int], content: str
     ) -> None:
         x, y = position[0], position[1] + 90
-        surface.blit(self.stack_text.render(content, True, (255, 255, 255)), (x, y))
+        surface.blit(
+            self.stack_text.render(content, True, (255, 255, 255)),
+            dest=(x + self.padx, y),
+        )
 
 
 class Pot:
@@ -187,4 +194,12 @@ class Pot:
             self.total_chips += chips
         rect = pygame.Rect(x + 400, y, 60, 30)
         pygame.draw.rect(surface, (255, 255, 255), rect)
-        surface.blit(self.font.render(str(self.total_chips), True, (0, 0, 0)), (x, y))
+        surface.blit(
+            self.font.render(str(self.total_chips), True, (0, 0, 0)),
+            (x + 410, y + 5),
+        )
+
+
+class ActionDesctiption:
+    def __init__(self):
+        pass

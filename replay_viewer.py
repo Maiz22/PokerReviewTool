@@ -17,6 +17,7 @@ through player change things
 class ReplayViewer:
     def __init__(self, hand_history: list) -> None:
         pygame.init()
+        pygame.display.set_caption("PokerReplay")
         self.geometry = (1280, 720)
         self.max_fps = 60
         self.background_img = pygame.image.load(
@@ -40,36 +41,6 @@ class ReplayViewer:
             for card in os.listdir(cards_dir)
         }
         return cards_dict
-
-    def draw_hand(
-        self,
-        position: tuple[int],
-        cards: tuple[str],
-        screen: pygame.Surface,
-    ) -> None:
-        card_width, card_height = 60, 90
-        # card1 = Card(
-        #    x=position[0], y=position[1], image_path="images/{}".format(cards[0])
-        # )
-        # card2 = Card(
-        #    x=position[0] + card_width,
-        #    y=position[1],
-        #    image_path="images/{}".format(cards[0]),
-        # )
-        # cards = pygame.sprite.Group()
-        # cards.add(card1, card2)
-        # card1.update()
-        # card2.update()
-        # cards.draw(screen, position)
-        # print(position)
-        # b = Button("images/dealer.png")
-        # b.draw(screen, (position[1][0], position[1][1]))
-        card1 = self.card_images["as"]
-        card2 = self.card_images["2s"]
-        card1.draw(screen, x=position[0][0], y=position[0][1])
-        card2.draw(screen, x=position[0][0] + 60, y=position[0][1])
-        stats = Stats()
-        stats.draw(screen, position[0])
 
     def run(self) -> None:
         """
@@ -99,18 +70,6 @@ class ReplayViewer:
 
         pygame.display.flip()
 
-        # table_dict = table.setup()
-
-        # for key, val in self.seat_dict:
-
-        # for seat in positions:
-        #    # print(seat)
-        #    self.draw_hand(
-        #        seat,
-        #        ("card-back_final.png", "card-back_final.png"),
-        #        screen=self.main_surface,
-        #    )
-
         running = True
 
         while running:
@@ -122,23 +81,28 @@ class ReplayViewer:
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
-                        print("key right")
                         if action_index is None:
                             action_index = 0
-                        # elif action_index < (len(list_of_actions) - 1):
                         else:
                             action_index += 1
-                        self.hand_history[action_index].execute(parent=self)
-                        print(action_index)
+                        try:
+                            if self.hand_history[action_index] is not None:
+                                self.hand_history[action_index].execute(parent=self)
+                                print(self.hand_history[action_index])
+                        except IndexError:
+                            print("Reached the end of the round.")
 
                     if event.key == pygame.K_LEFT:
-                        print("key left")
                         if action_index is None:
                             action_index = 0
                         elif action_index > 0:
                             action_index -= 1
-                        self.hand_history[action_index].execute(parent=self)
-                        print(action_index)
+                        try:
+                            if self.hand_history[action_index] is not None:
+                                self.hand_history[action_index].execute(parent=self)
+                                print(self.hand_history[action_index])
+                        except IndexError:
+                            print("Reached the end of the round.")
 
                     pygame.display.flip()
 
