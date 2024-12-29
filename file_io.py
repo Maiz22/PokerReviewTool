@@ -10,7 +10,3 @@ def parse_txt_to_list(path: str) -> list[str]:
         print("File {} not foun in {}.".format(path, dir))
     except Exception as err:
         print(err)
-
-
-def write_output_txt() -> None:
-    pass
