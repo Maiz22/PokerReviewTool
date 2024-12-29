@@ -1,18 +1,25 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from action import BaseAction
-
+import os
 from file_io import parse_txt_to_list
-
-# from hand_history_parser import RoundParser
 from action_registry import ActionRegistry
 from action import *
-import os
 
 
-def parse_list_to_rounds_of_actions(txt_list: list[str]):
+def parse_list_to_rounds_of_actions(
+    txt_list: list[str],
+) -> tuple[list[list[BaseAction]], int, int, int, int]:
+    """
+    Loops through the list of raw lines (string) of the
+    raw handhistory input. Parses each line and creates
+    and instance of an Action using the
+    ActionRegistry.get_action() method, that stores each
+    Action and its regex pattern in a list. Actions are
+    stored in single rounds which are added to the rounds
+    list, once a single round is completed.
+    Returns:
+    rounds: BaseAction instances in lists of lists
+    total_actions, total_known_actions, total_unknown_actions,
+    unknown_lines: int values describing the parsing
+    """
     total_actions, total_known_actions, total_unknown_actions = 0, 0, 0
     rounds, single_round = [], []
 
@@ -45,21 +52,3 @@ def parse_list_to_rounds_of_actions(txt_list: list[str]):
         total_unknown_actions,
         unknown_lines,
     )
-
-
-if __name__ == "__main__":
-    path = os.path.dirname(os.path.realpath(__file__))
-    dir = f"{path}/input"
-    filename = "HH20191006 T2702134214 No Limit Hold'em $9,80 + $1,20.txt"
-    txt_list = parse_txt_to_list(filename=filename, dir=dir)
-
-    (
-        rounds,
-        total_actions,
-        total_known_actions,
-        total_unknown_actions,
-        unknown_lines,
-    ) = parse_list_to_rounds_of_actions(txt_list=txt_list)
-
-    for round in rounds:
-        print(round)
