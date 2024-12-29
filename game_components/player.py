@@ -72,5 +72,14 @@ class Player:
         card1.draw(surface=surface, x=x, y=y)
         card2.draw(surface=surface, x=x + 60, y=y)
 
+    def draw_action_description(
+        self, surface: pygame.Surface, action: str, width: int
+    ) -> pygame.Rect:
+        x, y = self.seat.stat_coords
+        rect = pygame.Rect(x + 5, y + 55, width, 26)
+        pygame.draw.rect(surface, (255, 255, 255), rect, border_radius=3)
+        surface.blit(self.font.render(action, True, (0, 0, 0)), (x + 10, y + 60))
+        return rect
+
     def __repr__(self) -> str:
         return "Name:{} Seat: {}".format(self.name, self.seat.num)

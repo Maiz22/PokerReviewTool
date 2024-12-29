@@ -25,6 +25,7 @@ class ReplayViewer:
         self.hand_history = hand_history
         self.seat_dict = {}
         self.player_dict = {}
+        self.temp_action_description = None
 
     def pre_load_card_images(self) -> dict[str:Card]:
         """
@@ -81,6 +82,16 @@ class ReplayViewer:
 
                     # on right arrow increment action index and execute action
                     if event.key == pygame.K_RIGHT:
+
+                        # if there is a pygame.Rect instance in temp_action_description it chould be removed by redrawing the background
+                        if self.temp_action_description:
+                            background_section = self.background_img.subsurface(
+                                self.temp_action_description
+                            )
+                            self.main_surface.blit(
+                                background_section, self.temp_action_description.topleft
+                            )
+                            pygame.display.update(self.temp_action_description)
                         if action_index is None:
                             action_index = 0
                         else:

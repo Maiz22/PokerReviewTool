@@ -82,6 +82,10 @@ class PlaceAnte(BaseAction):
             parent.main_surface, difference=-float(self.amount)
         )
         parent.pot.update_pot(parent.main_surface, float(self.amount))
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Place Ante {self.amount}", width=100
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:PlaceAnte] Player: {self.player} Ante: {self.amount}"
@@ -118,7 +122,14 @@ class Bet(BaseAction):
         self.amount = match[2]
 
     def execute(self, parent, forward: bool = True):
-        print("Action not implemented")
+        parent.player_dict[self.player].update_stack(
+            parent.main_surface, difference=-float(self.amount)
+        )
+        parent.pot.update_pot(parent.main_surface, float(self.amount))
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Bet {self.amount}", width=60
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self) -> str:
         return f"[Action:Bet] Player: {self.player} Amount: {self.amount}"
@@ -153,6 +164,10 @@ class Raise(BaseAction):
             parent.main_surface, difference=-float(self.amount_to)
         )
         parent.pot.update_pot(parent.main_surface, float(self.amount_to))
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Raise to {self.amount_to}", width=100
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:Raise] Player: {self.player} Amount: {self.amount_from} -> {self.amount_to}"
@@ -166,7 +181,10 @@ class Check(BaseAction):
         self.player = match[1]
 
     def execute(self, parent, forward: bool = True):
-        print("Action not implemented")
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Check", width=50
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:Check] Player: {self.player}"
@@ -174,7 +192,7 @@ class Check(BaseAction):
 
 @ActionRegistry.register()
 class Call(BaseAction):
-    pattern = r"^(.+): calls (d\+)"
+    pattern = r"^(.+): calls (\d+)"
 
     def __init__(self, match) -> None:
         self.player = match[1]
@@ -185,6 +203,10 @@ class Call(BaseAction):
             parent.main_surface, difference=-float(self.amount)
         )
         parent.pot.update_pot(parent.main_surface, float(self.amount))
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Call {self.amount}", width=70
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:Call] Player: {self.player} Amount: {self.amount}"
@@ -205,6 +227,10 @@ class Fold(BaseAction):
                 parent.card_images["card-back-inactive"],
             ),
         )
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Fold", width=40
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:Fold] Player: {self.player}"
@@ -331,6 +357,10 @@ class PlaceSB(BaseAction):
             surface=parent.main_surface, difference=-self.amount
         )
         parent.pot.update_pot(surface=parent.main_surface, chips=self.amount)
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Place SB {str(self.amount)}", width=100
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:PlaceSB] Player: {self.player} Amount: {self.amount}"
@@ -349,6 +379,10 @@ class PlaceBB(BaseAction):
             surface=parent.main_surface, difference=-self.amount
         )
         parent.pot.update_pot(surface=parent.main_surface, chips=self.amount)
+        rect = parent.player_dict[self.player].draw_action_description(
+            parent.main_surface, f"Place BB {str(self.amount)}", width=100
+        )
+        parent.temp_action_description = rect
 
     def __repr__(self):
         return f"[Action:PlaceSB] Player: {self.player} Amount: {self.amount}"
