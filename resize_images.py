@@ -10,8 +10,8 @@ def resize_all(dest_dir: str, target_dir: str, width: int, height: int) -> None:
 
 def resize_one(dest_dir: str, target_dir: str, width: int, height: int) -> None:
     image = Image.open(dest_dir)
-    file = dest_dir.split("/")[-1]
-    image.resize((width, height)).save(os.path.join(target_dir, file))
+    file_name = dest_dir.split("/")[-1]
+    image.resize((width, height)).save(os.path.join(target_dir, f"{file_name}_resized"))
 
 
 if __name__ == "__main__":
