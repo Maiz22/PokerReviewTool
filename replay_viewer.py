@@ -6,6 +6,12 @@ from game_components.table import Table
 
 
 class ReplayViewer:
+    """
+    Class representing the hand history replay viewer. Pygame
+    is used to setup a poker table and replay a session round
+    by round, action by action.
+    """
+
     def __init__(self, hand_history: list) -> None:
         pygame.init()
         pygame.display.set_caption("PokerReplay")
@@ -35,42 +41,45 @@ class ReplayViewer:
 
     def run(self) -> None:
         """
-        Start the pygame event loop.
+        Pygame main loop to replay selected round of the hand history.
         """
-        print(self.hand_history)
-
         self.main_surface = pygame.display.set_mode(self.geometry)
         self.main_surface.blit(self.background_img, (0, 0))
-        pygame.display.flip()
         self.clock = pygame.time.Clock()
 
-        list_of_actions = [i for i in range(len(self.hand_history))]
-        action_index = None
-
-        # setupt table
-        # total_seats = get_total_seats()
-
         total_seats = 9
+
+        # create the basic table setup
         table = Table(total_seats=total_seats)
         self.seat_dict = table.create_seats()
+
+        # create an empty pot
         self.pot = Pot()
         self.pot.update_pot(self.main_surface)
 
+        # draw all seats
         for seat in self.seat_dict.values():
             seat.draw_frame(self.main_surface)
 
+        # refresh pygame window
         pygame.display.flip()
 
         running = True
+        action_index = None
 
         while running:
 
             # check for inputs
             for event in pygame.event.get():
+
+                # quit pygame loop when window is closed
                 if event.type == pygame.QUIT:
                     running = False
 
+                # react to keydown event
                 if event.type == pygame.KEYDOWN:
+
+                    # on right arrow increment action index and execute action
                     if event.key == pygame.K_RIGHT:
                         if action_index is None:
                             action_index = 0
@@ -83,6 +92,7 @@ class ReplayViewer:
                         except IndexError:
                             print("Reached the end of the round.")
 
+                    # on left arror decrement action index and execute action
                     if event.key == pygame.K_LEFT:
                         if action_index is None:
                             action_index = 0
@@ -95,14 +105,11 @@ class ReplayViewer:
                         except IndexError:
                             print("Reached the end of the round.")
 
+                    # refresh pygame window
                     pygame.display.flip()
 
+            # set max fps
             self.clock.tick(self.max_fps)
 
+        # quit pygame main loop
         pygame.quit()
-
-
-if __name__ == "__main__":
-    replay_viewer = ReplayViewer(hand_history=None)
-    replay_viewer.run()
-    replay_viewer.pre_load_card_images()
