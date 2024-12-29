@@ -9,8 +9,7 @@ from re import Match
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from action_registry import ActionRegistry
-
-from game_components import Player, Seat, Stats
+from game_components.player import Player
 
 if TYPE_CHECKING:
     import re

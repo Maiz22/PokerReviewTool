@@ -1,17 +1,8 @@
 import pygame
 import os
-
-# from action import MockAction
-from game_components import Card, Stats, Table, Pot
-
-
-"""
-Determine total num of seats
-Create Seat -> give it coords at creation
-Create Player -> give it a seat
-add player to review tools dict of players
-through player change things
-"""
+from game_components.card import Card
+from game_components.pot import Pot
+from game_components.table import Table
 
 
 class ReplayViewer:
