@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
-from PIL import ImageTk, Image
 
 
 class View(tk.Tk):
@@ -9,7 +8,6 @@ class View(tk.Tk):
         super().__init__()
         self.title("PokerReview")
         self.resizable(False, False)
-        # self.geometry("400x400")
 
         self.setup_frame = tk.Frame(self)
         self.setup_frame.pack(fill="both", expand=True, pady=10)

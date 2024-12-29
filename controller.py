@@ -102,9 +102,13 @@ class Controller:
         self.view.text_field.see("end")
 
     def del_text_from_view(self) -> None:
+        """
+        Delete the last line from the text field.
+        """
         self.view.text_field.delete("end-2l", "end-1l")
 
     def select_round(self, event=None) -> None:
+        """ """
         try:
             self.round_number = int(self.view.round_number_var.get()) - 1
             self.active_round = self.all_rounds[self.round_number]
@@ -115,6 +119,10 @@ class Controller:
             print("Round {} not in all rounds.")
 
     def set_action_button_activation_state(self) -> None:
+        """
+        Set the activation state of the next and previous button
+        depending on the active round we are in.
+        """
         if self.action_index == (len(self.active_round) - 1):
             self.view.next_button.configure(state="disabled")
             self.view.prev_button.configure(state="normal")
@@ -128,6 +136,9 @@ class Controller:
         return
 
     def next_action(self, event) -> None:
+        """
+        Prints the next action to the views textfield.
+        """
         if not self.action_index is None and self.action_index < (
             len(self.active_round) - 1
         ):
@@ -141,12 +152,19 @@ class Controller:
             )
 
     def prev_action(self, event) -> None:
+        """
+        Removes the last action from the views textfield.
+        """
         if not self.action_index is None and self.action_index > 0:
             self.action_index -= 1
             self.set_action_button_activation_state()
             self.del_text_from_view()
 
     def review_hand_history(self, event) -> None:
+        """
+        Opens the Replay viewer of the currently selected round:
+        self.active round.
+        """
         if not self.active_round:
             self.print_to_view(content="Please select a round first")
         elif self.replay_viewer is not None:
@@ -156,16 +174,6 @@ class Controller:
             self.replay_viewer.run()
             self.replay_viewer = None
         return "break"
-
-    # def next_round(self) -> None:
-    #    if self.round_number < len(self.all_rounds - 1):
-    #        self.round_number += 1
-    #    self.activate_round()
-    #
-    # def prev_round(self) -> None:
-    #    if self.round_number > 0:
-    #        self.round_number -= 1
-    #    self.activate_round()
 
     def run(self) -> None:
         """
