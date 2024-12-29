@@ -17,19 +17,38 @@ if TYPE_CHECKING:
 
 
 class BaseAction(ABC):
+    """
+    Abststract BaseAction to set the blueprint for all Actions.
+    An action should have a pattern which will be used to
+    create an instance if there is a match.
+    Concrete Actions shall get a @ActionRegistry.register()
+    decorator to automatically add them to a registry when
+    they are imported.
+    """
+
+    pattern = r""
 
     @abstractmethod
     def __init__(self, match: re.Match) -> None:
+        """
+        Takes the re match of the classes pattern and creates
+        an instance with certain groups of the match as parameters.
+        """
         pass
 
     @abstractmethod
-    def execute(self, parent):
+    def execute(self, parent, forward: bool = True):
+        """
+        Implementation of an action execution. Will take parents
+        parameters and parameter detemine if we move forward
+        or backwarts in order to react accordingly.
+        """
         pass
 
 
 @ActionRegistry.register()
 class UpdateSeat(BaseAction):
-    pattern = r"^Seat (\d{1}): (.+) \((.+) in chips\)"
+    pattern = r"^Seat (\d{1}): (.+) \((\d+) in chips\)"
 
     def __init__(self, match: re.Match) -> None:
         self.seat_number = int(match[1])
