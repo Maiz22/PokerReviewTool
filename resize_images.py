@@ -1,3 +1,8 @@
+"""
+Helper script resizing the original images since scaling down
+inside pygame leads to bad visuals.
+"""
+
 from PIL import Image
 import os
 
