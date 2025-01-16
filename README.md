@@ -1,6 +1,5 @@
 # PokerReviewTool
-Pokerstars Review Tool reading a users Pokerstars hand history (.txt file), parses it to create actions and displays the history inside a gui by recreating a poker table.
-A basic gui to read a hand history and start the reviewing process is created using tkinter in a MVC architecture.
+The PokerStars Review Tool reads a user's PokerStars hand history (stored as a .txt file), parses it to extract actions, and displays the history within a graphical interface by recreating a virtual poker table. A basic GUI, developed using tkinter with an MVC architecture, serves as the starting point for reviewing hands.
 
 ![screenshot_resized](https://github.com/user-attachments/assets/8eeb629d-0b51-4d6b-95b2-42de784be89f)
 
