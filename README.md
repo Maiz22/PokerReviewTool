@@ -12,9 +12,9 @@ Upon clicking "Review..." in the tkinter GUI, a pygame window opens, simulating 
 ### Parsing and Actions
 The core of the tool’s parsing functionality lies in its modular action-handling system, defined within action.py. Actions are registered in an action registry and are based on the abstract BaseAction class, which serves as their blueprint.
 Each action consists of three key components:
-Pattern: A regex pattern used to identify and match the corresponding line in the hand history file.
-Constructor: Creates class attributes by extracting values from the regex match groups.
-Execute Method: Takes the pygame main surface as input to visually render the action on the poker table.
+- Pattern: A regex pattern used to identify and match the corresponding line in the hand history file.
+- Constructor: Creates class attributes by extracting values from the regex match groups.
+- Execute Method: Takes the pygame main surface as input to visually render the action on the poker table.
 Adding new actions is straightforward by following the blueprint defined in BaseAction. 
 
 Status:
