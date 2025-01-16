@@ -17,5 +17,5 @@ Each action consists of three key components:
 - Execute Method: Takes the pygame main surface as input to visually render the action on the poker table.
 Adding new actions is straightforward by following the blueprint defined in BaseAction. 
 
-Status:
-A first version has been created making it possible to review basic Pokerstars hands. Further patterns are necessary to match all actions given in the hand history txt file. The execution method has only been created for the most important actions. 
+### Current Status
+The initial version allows users to review basic PokerStars hands. However, additional regex patterns need to be implemented to fully match all potential actions in the hand history file. Similarly, the execute method currently supports only the most important actions and requires further development for comprehensive functionality.
